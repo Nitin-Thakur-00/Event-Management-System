@@ -1,4 +1,4 @@
-# 🚀 FET-JU Event Management System
+# 🚀 Event Management System
 
 > A full-stack web application for managing college events, registrations, and core team memberships.
 
@@ -28,7 +28,7 @@ This project is a comprehensive Event Management Dashboard built to streamline t
 
 ## 📂 Project Structure
 ```bash
-fet-ju-event-manager/
+cd Event-Management-System/
 ├── backend/             # Backend Server & Database
 │   ├── server.js        # Main Entry Point (API & SQL Logic)
 │   ├── database.db      # SQLite Database File (Auto-generated)
@@ -41,12 +41,34 @@ fet-ju-event-manager/
 │   ├── pages/           # Application Pages (Index, Apply, DatabaseView)
 │   └── App.tsx          # Main Routing Logic
 └── package.json         # Frontend Dependencies
+```
 
-Getting StartedFollow these steps to run the project locally on your machine.PrerequisitesNode.js (v14 or higher) installed on your system.InstallationClone the repositoryBashgit clone [
-cd fet-ju-event-manager
-Setup the BackendBashcd backend
+## Local Setup
+Follow these steps to run the project locally on your machine:
+
+Prerequisites-
+Node.js (v14 or higher) installed on your system.
+
+Installation-
+Clone the repository and navigate into the project directory:
+```Bash
+git clone https://github.com/Nitin-Thakur-00/Event-Management-System.git
+cd Event-Management-System
+```
+Setup the Backend-
+Navigate to the backend folder, install dependencies, and start the server.:
+```Bash
+cd backend
 npm install
 node server.js
-You should see: "Connected to the SQLite database" and "Server running on port 3000".Setup the FrontendOpen a new terminal (keep the backend running!) and navigate back to the root folder:Bashcd ..
+```
+You should see: "Connected to the SQLite database" and "Server running on port 3000".
+
+Setup the Frontend-
+Open a new terminal window (keep the backend server running in the first terminal!). Navigate back to the root folder , install dependencies, and start the development server.
+```Bash
+cd ..
 npm install
 npm run dev
+```
+Your frontend should now be running and accessible, typically at http://localhost:5173 or a similar port.
