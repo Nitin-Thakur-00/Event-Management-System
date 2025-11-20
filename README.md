@@ -51,15 +51,13 @@ Node.js (v14 or higher) installed on your system.
 
 Installation-
 Clone the repository and navigate into the project directory:
-```
-Bash
+```Bash
 git clone https://github.com/Nitin-Thakur-00/Event-Management-System.git
 cd Event-Management-System
 ```
 Setup the Backend-
 Navigate to the backend folder, install dependencies, and start the server.:
-```
-Bash
+```Bash
 cd backend
 npm install
 node server.js
@@ -68,8 +66,7 @@ You should see: "Connected to the SQLite database" and "Server running on port 3
 
 Setup the Frontend-
 Open a new terminal window (keep the backend server running in the first terminal!). Navigate back to the root folder , install dependencies, and start the development server.
-```
-Bash
+```Bash
 cd ..
 npm install
 npm run dev
