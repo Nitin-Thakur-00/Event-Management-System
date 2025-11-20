@@ -11,12 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, CheckCircle2, Sparkles, Loader2, Table2, Home } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Sparkles, Loader2, Home } from "lucide-react";
 import { toast } from "sonner";
 import { useEvents } from "@/context/EventContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-// --- REAL API Functions ---
+// --- API Functions ---
 
 const submitNewApplication = async (data: any) => {
   const response = await fetch('http://localhost:3000/api/apply', {
@@ -28,14 +28,13 @@ const submitNewApplication = async (data: any) => {
   return response.json();
 };
 
-// UPDATED: Now accepts 'role' to distinguish Core vs Volunteer
 const submitExistingApplication = async (payload: { usn: string; eventId: string; role: string }) => {
   const response = await fetch('http://localhost:3000/api/apply', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
       usn: payload.usn, 
-      userType: payload.role, // Sends 'core' or 'volunteer'
+      userType: payload.role, 
       eventId: payload.eventId 
     }),
   });
@@ -52,12 +51,6 @@ const checkUsnExists = async (usn: string) => {
   return response.json();
 };
 
-const fetchApplications = async (eventId: string) => {
-  const response = await fetch(`http://localhost:3000/api/events/${eventId}/applications`);
-  if (!response.ok) throw new Error('Failed to fetch');
-  return response.json();
-};
-
 // --- Component ---
 
 const EventApplication = () => {
@@ -68,7 +61,8 @@ const EventApplication = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [dbData, setDbData] = useState<any[]>([]);
+  
+  const [hasRegistered, setHasRegistered] = useState(false); 
   
   const [userType, setUserType] = useState<"core" | "volunteer" | "new" | null>(null);
   const [existingUsn, setExistingUsn] = useState("");
@@ -93,14 +87,8 @@ const EventApplication = () => {
   const handleSuccess = async () => {
     if (eventId) {
       addAppliedEvent(Number(eventId));
-      try {
-        const data = await fetchApplications(eventId);
-        setDbData(data);
-      } catch (e) {
-        console.error("Could not fetch table", e);
-      }
     }
-    toast.success("Application saved to database!");
+    toast.success("Registration Successful.");
     setIsSubmitted(true);
     setIsLoading(false);
   };
@@ -111,7 +99,6 @@ const EventApplication = () => {
     try {
       const check = await checkUsnExists(existingUsn);
       if (check.exists) {
-        // UPDATED: Pass the specific role (Core/Volunteer) here
         await submitExistingApplication({ 
           usn: existingUsn, 
           eventId: eventId || "0", 
@@ -133,7 +120,17 @@ const EventApplication = () => {
     setIsLoading(true);
     try {
       await submitNewApplication({ ...newApplicant, eventId: eventId || "0" });
-      handleSuccess();
+      
+      toast.success("Details Registered! Now select 'Core' or 'Volunteer' to apply.", {
+        duration: 4000,
+        icon: <CheckCircle2 className="w-5 h-5 text-green-500"/>
+      });
+      
+      setExistingUsn(newApplicant.usn);
+      setIsLoading(false);
+      setHasRegistered(true);
+      setUserType(null);      
+      
     } catch (err) {
       toast.error("Connection Error. Is backend running?");
       setIsLoading(false);
@@ -146,79 +143,33 @@ const EventApplication = () => {
 
   const isNewFormValid = Object.values(newApplicant).every(Boolean);
 
+  // --- RENDER LOGIC ---
+
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-center p-4">
         <div className="fixed top-6 right-6 z-50"><ThemeToggle /></div>
 
-        <Card className="max-w-4xl w-full p-8 text-center bg-card/80 backdrop-blur-sm shadow-[var(--shadow-card)] mb-8">
+        <Card className="max-w-md w-full p-8 text-center bg-card/80 backdrop-blur-sm shadow-[var(--shadow-card)]">
           <div className="mb-6 flex justify-center">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
               <CheckCircle2 className="w-10 h-10 text-primary animate-in zoom-in" />
             </div>
           </div>
+          
           <h2 className="text-2xl font-bold text-foreground mb-2">
-            Database Updated Successfully!
+            Registration Successful.
           </h2>
-          <p className="text-muted-foreground mb-6">
-            Your details have been recorded in the <strong>Applications</strong> table.
+          
+          <p className="text-muted-foreground mb-8">
+             Your application has been successfully recorded.
           </p>
+          
           <div className="flex justify-center gap-4">
-             <Button onClick={() => navigate('/')} variant="outline">
+             <Button onClick={() => navigate('/')} variant="outline" className="w-full">
                 <Home className="w-4 h-4 mr-2" /> Return Home
              </Button>
           </div>
-        </Card>
-
-        <Card className="max-w-6xl w-full p-6 bg-card/90 backdrop-blur-sm border-primary/20 shadow-2xl overflow-hidden">
-            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border">
-                <Table2 className="w-5 h-5 text-primary" />
-                <h3 className="text-xl font-bold">Live Database View: Participants</h3>
-            </div>
-            
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
-                        <tr>
-                            <th className="px-4 py-3">ID</th>
-                            <th className="px-4 py-3">USN</th>
-                            <th className="px-4 py-3">Name</th>
-                            <th className="px-4 py-3">Branch</th>
-                            <th className="px-4 py-3">Type</th>
-                            <th className="px-4 py-3">Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                        {dbData.map((app: any) => (
-                            <tr key={app.id} className="hover:bg-muted/30 transition-colors">
-                                <td className="px-4 py-3 font-mono text-xs">{app.id}</td>
-                                <td className="px-4 py-3 font-medium">{app.usn}</td>
-                                <td className="px-4 py-3">{app.name || <span className="text-muted-foreground italic">N/A (Existing)</span>}</td>
-                                <td className="px-4 py-3">{app.branch || "-"}</td>
-                                <td className="px-4 py-3">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                        app.type === 'NEW' 
-                                        ? 'bg-blue-500/10 text-blue-600' 
-                                        : 'bg-purple-500/10 text-purple-600'
-                                    }`}>
-                                        {app.type}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-3 text-muted-foreground">
-                                    {new Date(app.created_at).toLocaleString()}
-                                </td>
-                            </tr>
-                        ))}
-                        {dbData.length === 0 && (
-                            <tr>
-                                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                                    No entries found in database.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
         </Card>
       </div>
     );
@@ -229,8 +180,12 @@ const EventApplication = () => {
       return (
         <div className="space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">How are you registering?</h2>
-            <p className="text-muted-foreground">Please select your role.</p>
+            <h2 className="text-2xl font-bold text-foreground">
+              {hasRegistered ? "Step 2: Select Your Role" : "How are you registering?"}
+            </h2>
+            <p className="text-muted-foreground">
+              {hasRegistered ? "Your details are saved. Now apply for the event." : "Please select your role."}
+            </p>
           </div>
           <div className="flex flex-col gap-4">
             <Button variant="outline" size="lg" onClick={() => handleUserTypeSelection("core")} className="h-20 text-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-all">
@@ -239,9 +194,12 @@ const EventApplication = () => {
             <Button variant="outline" size="lg" onClick={() => handleUserTypeSelection("volunteer")} className="h-20 text-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-all">
               Volunteer
             </Button>
-            <Button variant="outline" size="lg" onClick={() => handleUserTypeSelection("new")} className="h-20 text-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-all">
-              Registering for the first time
-            </Button>
+            
+            {!hasRegistered && (
+              <Button variant="outline" size="lg" onClick={() => handleUserTypeSelection("new")} className="h-20 text-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-all">
+                Registering for the first time
+              </Button>
+            )}
           </div>
         </div>
       );
@@ -280,56 +238,24 @@ const EventApplication = () => {
         <form onSubmit={handleNewSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="new-usn">Enter USN *</Label>
-            <Input
-              id="new-usn"
-              required
-              placeholder="e.g. 24BTRCN026"
-              className="bg-background/50 backdrop-blur-sm"
-              value={newApplicant.usn}
-              onChange={(e) => handleNewApplicantChange("usn", e.target.value)}
-            />
+            <Input id="new-usn" required placeholder="e.g. 24BTRCN026" value={newApplicant.usn} onChange={(e) => handleNewApplicantChange("usn", e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-name">Enter Name *</Label>
-            <Input
-              id="new-name"
-              required
-              placeholder="e.g. Nitin Thakur"
-              className="bg-background/50 backdrop-blur-sm"
-              value={newApplicant.name}
-              onChange={(e) => handleNewApplicantChange("name", e.target.value)}
-            />
+            <Input id="new-name" required placeholder="e.g. Nitin Thakur" value={newApplicant.name} onChange={(e) => handleNewApplicantChange("name", e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-contact">Enter Contact Number *</Label>
-            <Input
-              id="new-contact"
-              type="tel"
-              required
-              placeholder="+91 98765 43210"
-              className="bg-background/50 backdrop-blur-sm"
-              value={newApplicant.contact}
-              onChange={(e) => handleNewApplicantChange("contact", e.target.value)}
-            />
+            <Input id="new-contact" type="tel" required placeholder="+91 98765 43210" value={newApplicant.contact} onChange={(e) => handleNewApplicantChange("contact", e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-email">Enter Email Address *</Label>
-            <Input
-              id="new-email"
-              type="email"
-              required
-              placeholder="nitin@university.edu"
-              className="bg-background/50 backdrop-blur-sm"
-              value={newApplicant.email}
-              onChange={(e) => handleNewApplicantChange("email", e.target.value)}
-            />
+            <Input id="new-email" type="email" required placeholder="nitin@university.edu" value={newApplicant.email} onChange={(e) => handleNewApplicantChange("email", e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-branch">Enter Branch Name *</Label>
             <Select required onValueChange={(val) => handleNewApplicantChange("branch", val)}>
-              <SelectTrigger className="bg-background/50 backdrop-blur-sm">
-                <SelectValue placeholder="Select your branch" />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select your branch" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="CSE">Computer Science</SelectItem>
                 <SelectItem value="ISE">Information Science</SelectItem>
@@ -339,12 +265,11 @@ const EventApplication = () => {
               </SelectContent>
             </Select>
           </div>
-          
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="new-year">Enter Year *</Label>
               <Select required onValueChange={(val) => handleNewApplicantChange("year", val)}>
-                <SelectTrigger className="bg-background/50 backdrop-blur-sm"><SelectValue placeholder="Year" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1">1st Year</SelectItem>
                   <SelectItem value="2">2nd Year</SelectItem>
@@ -356,7 +281,7 @@ const EventApplication = () => {
             <div className="space-y-2">
               <Label htmlFor="new-section">Enter Section *</Label>
               <Select required onValueChange={(val) => handleNewApplicantChange("section", val)}>
-                <SelectTrigger className="bg-background/50 backdrop-blur-sm"><SelectValue placeholder="Section" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Section" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="A">A</SelectItem>
                   <SelectItem value="B">B</SelectItem>
@@ -372,8 +297,7 @@ const EventApplication = () => {
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </Button>
             <Button type="submit" className="flex-1 group/btn relative overflow-hidden shadow-lg hover:shadow-xl" disabled={!isNewFormValid || isLoading}>
-              {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />}
-              Submit Application
+              {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : "Register Details"}
             </Button>
           </div>
         </form>
@@ -385,14 +309,11 @@ const EventApplication = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <div className="fixed top-6 right-6 z-50"><ThemeToggle /></div>
       
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-      </div>
-
-      <header className="relative py-16 px-4 overflow-hidden">
+      <header className="relative py-16 px-4"> {/* Removed overflow-hidden here */}
+        {/* Background layers (Removed overflow-hidden) */}
+        <div className="absolute inset-0 bg-slate-900/90 -z-10" />
         <div className="absolute inset-0 bg-[image:var(--gradient-hero)] opacity-90" />
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 bg-[image:var(--gradient-shine)] animate-shimmer opacity-20" />
         </div>
 
@@ -406,7 +327,11 @@ const EventApplication = () => {
             <span className="text-sm font-medium text-white">Application Form</span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-2xl">{eventTitle}</h1>
+          {/* --- FIXED HEADER TEXT (No Cropping) --- */}
+          <h1 className="text-4xl md:text-5xl font-black mb-8 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent py-4 leading-relaxed drop-shadow-lg">
+            {eventTitle}
+          </h1>
+
           <div className="flex flex-wrap gap-4 text-white/90">
             <span className="flex items-center gap-2"><span className="text-sm font-medium">{eventDate}</span></span>
             <span className="flex items-center gap-2"><span className="text-sm font-medium">{eventLocation}</span></span>

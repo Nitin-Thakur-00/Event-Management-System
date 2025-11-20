@@ -20,10 +20,10 @@ interface DBEvent {
   image_url: string;
 }
 
-// --- 2. API Functions ---
+// --- 2. API Fetch Functions ---
 const fetchEvents = async (): Promise<DBEvent[]> => {
   const response = await fetch('http://localhost:3000/api/events');
-  if (!response.ok) throw new Error('Failed to fetch');
+  if (!response.ok) throw new Error('Failed to fetch events');
   return response.json();
 };
 
@@ -45,7 +45,7 @@ const Index = () => {
   const [filterType, setFilterType] = useState("all");
   const [appCount, setAppCount] = useState(0);
 
-  // --- 3. Fetch Real Data ---
+  // --- 3. Fetch Real Data from Backend ---
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events'],
     queryFn: fetchEvents,
@@ -105,11 +105,15 @@ const Index = () => {
             <span className="text-sm font-medium text-primary">FET-JU Events 2026</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent animate-slide-up">
-            Discover Amazing Events
+          {/* --- FIX: HEADER TEXT SPACING --- */}
+          {/* Changed mb-4 to mb-6, added py-4 leading-relaxed to force spacing */}
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent py-4 leading-relaxed animate-slide-up">
+            Ignite Your Campus Spirit
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: "100ms" }}>
-            Join exciting competitions, workshops, and networking opportunities at FET-JU
+          
+          {/* ADDED MARGIN TOP TO PUSH DOWN DESCRIPTION */}
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-slide-up mt-4" style={{ animationDelay: "100ms" }}>
+            Compete in electrifying battles, showcase your talent, and connect at the heart of FET-JU.
           </p>
         </div>
 
@@ -186,6 +190,7 @@ const Index = () => {
           </div>
         )}
 
+        {/* No results message */}
         {!isLoading && filteredEvents.length === 0 && (
           <div className="text-center py-20 animate-scale-in">
             <p className="text-2xl font-semibold text-muted-foreground mb-2">No events found</p>
