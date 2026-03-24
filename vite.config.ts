@@ -5,8 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // ADD THIS LINE: This fixes the 404/blank screen on GitHub Pages
-  base: "/your-repo-name/", 
+  base: "/Event-Management-System/", 
 
   server: {
     host: "::",
