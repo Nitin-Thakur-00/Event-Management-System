@@ -21,7 +21,7 @@ const App = () => {
           <EventProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+            <BrowserRouter basename="/Event-Management-System">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/apply" element={<EventApplication />} />
@@ -36,4 +36,4 @@ const App = () => {
   );
 };
 
-export default App; // <--- THIS LINE WAS MISSING
+export default App;
