@@ -22,14 +22,14 @@ interface DBEvent {
 
 // --- 2. API Fetch Functions ---
 const fetchEvents = async (): Promise<DBEvent[]> => {
-  const response = await fetch('http://localhost:3000/api/events');
+  const response = await fetch('/api/events')
   if (!response.ok) throw new Error('Failed to fetch events');
   return response.json();
 };
 
 const fetchAppCount = async (): Promise<number> => {
   try {
-    const response = await fetch('http://localhost:3000/api/applications');
+    const response = await fetch('/api/applications')
     const data = await response.json();
     return data.length;
   } catch (e) {

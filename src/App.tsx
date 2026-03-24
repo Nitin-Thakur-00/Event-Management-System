@@ -21,7 +21,7 @@ const App = () => {
           <EventProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter basename="/Event-Management-System">
+            <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/apply" element={<EventApplication />} />

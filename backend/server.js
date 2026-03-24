@@ -2,9 +2,9 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
-
+const path = require('path');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -207,6 +207,13 @@ app.get('/api/volunteers', (req, res) => {
 
 app.get('/api/events/:eventId/applications', (req, res) => {
   db.all(`SELECT * FROM applications WHERE event_id = ? ORDER BY created_at DESC`, [req.params.eventId], (err, rows) => res.json(rows));
+});
+
+// Serve frontend build
+app.use(express.static(path.join(__dirname, '../dist')));
+
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

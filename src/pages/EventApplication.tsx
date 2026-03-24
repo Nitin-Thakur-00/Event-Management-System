@@ -19,7 +19,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 // --- API Functions ---
 
 const submitNewApplication = async (data: any) => {
-  const response = await fetch('http://localhost:3000/api/apply', {
+  const response = await fetch('/api/apply', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...data, userType: 'new' }),
@@ -29,7 +29,7 @@ const submitNewApplication = async (data: any) => {
 };
 
 const submitExistingApplication = async (payload: { usn: string; eventId: string; role: string }) => {
-  const response = await fetch('http://localhost:3000/api/apply', {
+  const response = await fetch('/api/apply', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
@@ -43,7 +43,7 @@ const submitExistingApplication = async (payload: { usn: string; eventId: string
 };
 
 const checkUsnExists = async (usn: string) => {
-  const response = await fetch('http://localhost:3000/api/check-usn', {
+  const response = await fetch('/api/check-usn', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ usn }),

@@ -19,10 +19,10 @@ const DatabaseView = () => {
 
   useEffect(() => {
     // Fetch everything (simplest approach), we just hide what we don't need
-    fetch('http://localhost:3000/api/applications').then(res => res.json()).then(setApplications);
-    fetch('http://localhost:3000/api/core-team').then(res => res.json()).then(setCoreTeam);
-    fetch('http://localhost:3000/api/volunteers').then(res => res.json()).then(setVolunteers);
-    fetch('http://localhost:3000/api/events').then(res => res.json()).then(setEvents);
+    fetch('/api/applications').then(res => res.json()).then(setApplications);
+    fetch('/api/core-team').then(res => res.json()).then(setCoreTeam);
+    fetch('/api/volunteers').then(res => res.json()).then(setVolunteers);
+    fetch('/api/events').then(res => res.json()).then(setEvents);
   }, []);
 
   // Dynamic Title based on view
