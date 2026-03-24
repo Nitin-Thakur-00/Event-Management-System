@@ -2,9 +2,6 @@
 
 > A full-stack web application for managing college events, registrations, and core team memberships.
 
-![Project Preview](public/preview.png)
-*(Tip: Take a screenshot of your homepage, save it as `preview.png` in your `public` folder, and it will show up here!)*
-
 ## 📖 About
 This project is a comprehensive Event Management Dashboard built to streamline the process of organizing campus events. It allows students to browse upcoming events, register as participants, and apply for core team or volunteer roles. It features a dynamic backend that separates users into specific roles (Core, Volunteer, New) and a real-time database view for administrators.
 
