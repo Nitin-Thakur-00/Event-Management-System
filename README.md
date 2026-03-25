@@ -2,6 +2,10 @@
 
 > A full-stack web application for managing college events, registrations, and core team memberships.
 
+🔗 Live Demo
+The fully functional app is hosted on Render:  
+[🎉 View Live Demo](https://event-management-system-dy9u.onrender.com) 
+
 ## 📖 About
 This project is a comprehensive Event Management Dashboard built to streamline the process of organizing campus events. It allows students to browse upcoming events, register as participants, and apply for core team or volunteer roles. It features a dynamic backend that separates users into specific roles (Core, Volunteer, New) and a real-time database view for administrators.
 
