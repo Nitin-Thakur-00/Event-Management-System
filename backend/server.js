@@ -6,7 +6,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Allow GH Pages frontend to talk to backend
+app.use(cors({
+  origin: ['https://Nitin-Thakur-00.github.io'], // <-- your GH Pages URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Enable Foreign Key Constraints in SQLite (must be set per connection)

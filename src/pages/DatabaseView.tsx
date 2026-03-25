@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table2, ArrowLeft, Users, ShieldCheck, HeartHandshake, CalendarDays } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
+import { API_BASE_URL } from "@/config"; 
 const DatabaseView = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams(); // Hook to read URL params
@@ -18,12 +18,11 @@ const DatabaseView = () => {
   const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch everything (simplest approach), we just hide what we don't need
-    fetch('/api/applications').then(res => res.json()).then(setApplications);
-    fetch('/api/core-team').then(res => res.json()).then(setCoreTeam);
-    fetch('/api/volunteers').then(res => res.json()).then(setVolunteers);
-    fetch('/api/events').then(res => res.json()).then(setEvents);
-  }, []);
+  fetch(`${import.meta.env.VITE_API_URL}/api/applications`).then(res => res.json()).then(setApplications);
+  fetch(`${import.meta.env.VITE_API_URL}/api/core-team`).then(res => res.json()).then(setCoreTeam);
+  fetch(`${import.meta.env.VITE_API_URL}/api/volunteers`).then(res => res.json()).then(setVolunteers);
+  fetch(`${import.meta.env.VITE_API_URL}/api/events`).then(res => res.json()).then(setEvents);
+}, []);
 
   // Dynamic Title based on view
   const pageTitle = viewMode === 'events' ? "Events Master List" : "Applications Dashboard";

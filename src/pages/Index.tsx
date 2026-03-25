@@ -9,7 +9,7 @@ import { SearchFilter } from "@/components/SearchFilter";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useQuery } from "@tanstack/react-query";
-
+import { API_BASE_URL } from "@/config";
 // --- 1. Define Interface ---
 interface DBEvent {
   id: number;
@@ -20,16 +20,18 @@ interface DBEvent {
   image_url: string;
 }
 
+const API = import.meta.env.VITE_API_URL;
+
 // --- 2. API Fetch Functions ---
 const fetchEvents = async (): Promise<DBEvent[]> => {
-  const response = await fetch('/api/events')
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/events`);
   if (!response.ok) throw new Error('Failed to fetch events');
   return response.json();
 };
 
 const fetchAppCount = async (): Promise<number> => {
   try {
-    const response = await fetch('/api/applications')
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/applications`);
     const data = await response.json();
     return data.length;
   } catch (e) {
